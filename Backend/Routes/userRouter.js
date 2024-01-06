@@ -8,7 +8,7 @@ const userRouter=express.Router();
 
 userRouter.post("/register",async(req,res)=>{
     try{
-        const {name,email,password}=req.body;
+        const {name,email,password, userType, language, subject, classGrade}=req.body;
 
         const exitsUser=await UserModel.findOne({email});
         if(exitsUser){
@@ -18,7 +18,7 @@ userRouter.post("/register",async(req,res)=>{
             if(err){
                 return res.status(400).send({error:err.message})
             }
-            const user=new UserModel({name,email,password:hash})
+            const user=new UserModel({name,email,password:hash, userType, language, subject, classGrade})
 
             await user.save()
             res.status(201).send({messege:"User Register Successfully"})
@@ -47,7 +47,7 @@ userRouter.post("/login",async(req,res)=>{
                 return res.status(400).send({error:"Wrong Credentials"})
             }
             
-            const token=jwt.sign({userId:User._id},process.env.KEY);
+            const token=jwt.sign({userId:User._id,userType: User.userType},process.env.KEY);
 
             res.status(201).send({messege:"User login Successfully",token})
         })

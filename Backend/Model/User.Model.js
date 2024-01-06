@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema({
   subject: {
     type: String,
   },
-  class: {
+  classGrade: {
     type: String,
   },
 });
