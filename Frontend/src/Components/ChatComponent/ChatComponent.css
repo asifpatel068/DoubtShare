@@ -1,0 +1,49 @@
+.chatApp {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chatApp h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .chatApp .messageContainer {
+    margin-bottom: 15px;
+  }
+  
+  .chatApp .messageContainer div {
+    margin-bottom: 10px;
+  }
+  
+  .chatApp strong {
+    font-weight: bold;
+  }
+  
+  .chatApp input {
+    width: 70%;
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .chatApp button {
+    padding: 8px 12px;
+    cursor: pointer;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .chatApp button:hover {
+    background-color: #45a049;
+  }
+  

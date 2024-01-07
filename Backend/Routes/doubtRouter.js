@@ -4,13 +4,13 @@ const {auth} = require('../Middleware/auth');
 const Doubt = require('../Model/Doubt');
 
 
-doubtRouter.post('/create', auth, async (req, res) => {
+doubtRouter.post('/create',auth, async (req, res) => {
     try {
         const { question } = req.body;
-        const userId = req.user.userId; 
+         const userId = req.user.userId; 
         const newDoubt = new Doubt({
             userId,
-            question,
+            question
         });
 
         await newDoubt.save();
@@ -20,7 +20,6 @@ doubtRouter.post('/create', auth, async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
-
 
 
 doubtRouter.put('/update/:doubtId', auth, async (req, res) => {

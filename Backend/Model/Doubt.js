@@ -1,5 +1,3 @@
-// models/Doubt.js
-
 const mongoose = require('mongoose');
 
 const doubtSchema = new mongoose.Schema({
