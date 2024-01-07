@@ -9,7 +9,7 @@ export default function DoubtHistory() {
       try {
         const token = sessionStorage.getItem('token'); 
 
-        const response = await fetch('http://localhost:5050/doubt/history', {
+        const response = await fetch('https://doubtshare-smlr.onrender.com/doubt/history', {
           headers: {
             Authorization: `${token}`,
           },

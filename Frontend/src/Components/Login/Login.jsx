@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate  } from 'react-router-dom';
 import './Login.css';
@@ -26,7 +25,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const endpoint = isLogin ? 'http://localhost:5050/user/login' : 'http://localhost:5050/user/register';
+      const endpoint = isLogin ? 'https://doubtshare-smlr.onrender.com/user/login' : 'https://doubtshare-smlr.onrender.com/user/register';
 
       const response = await fetch(endpoint, {
         method: 'POST',
