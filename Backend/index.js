@@ -140,7 +140,7 @@ io.on('connection', (socket) => {
 
   });
   
-  cron.schedule('*/10 * * * *', async () => {
+  cron.schedule('*/20 * * * *', async () => {
     const currentTime = Date.now();
   
     try {
