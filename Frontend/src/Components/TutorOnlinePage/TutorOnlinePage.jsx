@@ -13,7 +13,7 @@ const TutorOnlinePage = () => {
   const [showChat, setShowChat] = useState(false); 
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5050/', { transports: ['websocket'] });
+    const newSocket = io('https://doubtshare-smlr.onrender.com/', { transports: ['websocket'] });
   
     newSocket.on('connect', () => {
       console.log('Socket connected successfully');
