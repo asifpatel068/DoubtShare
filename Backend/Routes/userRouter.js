@@ -72,10 +72,11 @@ userRouter.get("/all",async(req,res)=>{
       }
 })
 
-userRouter.get("/one",auth, async(req,res)=>{
+userRouter.get("/one/:userId", async(req,res)=>{
     try {
       
-        const userId = req.user.userId; 
+        const userId = req.params.userId; 
+        console.log(userId)
  
         const user = await UserModel.findById(userId)
     

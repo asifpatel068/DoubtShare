@@ -44,41 +44,60 @@ app.use("/doubt", doubtRouter);
 io.on('connection', (socket) => {
     console.log('A user connected');
   
-    socket.on('ping', async ({ userId }) => {
-        try {
-          const user = await UserModel.findById(userId);
-    
-          if (user && user.userType === 'Tutor') {
-            user.lastPingTime = Date.now();
-            await user.save();
-          }
-        } catch (error) {
-          console.error('Error updating tutor availability:', error);
+    socket.on('ping', async ( userId ) => {
+      try {
+        
+        const tutorAvailability = await TutorAvailability.findOne({
+          tutorId: userId,
+        });
+  
+        if (tutorAvailability) {
+          tutorAvailability.lastPingTime = Date.now();
+          await tutorAvailability.save();
+        } else {
+          await TutorAvailability.create({
+            tutorId: userId,
+            lastPingTime: Date.now(),
+          });
         }
-      });
+        updateAvailableTutorsCount();
+      } catch (error) {
+        console.error('Error updating tutor availability:', error);
+      }
+    });
+  
   
 
 
-   socket.on('doubtRequest', async (doubtData) => {
-    try {
-      const onlineTutors = await UserModel.find({
-
-        userType: 'Tutor',
-        lastPingTime: { $gt: Date.now() - 3000 },
-        language: doubtData.language, 
-        subjectExpertise: doubtData.subject,
-      });
-
-      onlineTutors.forEach((onlineTutor) => {
-        io.to(onlineTutor.socketId).emit('notification', {
-          studentId: doubtData.studentId,
-          message: 'New doubt request. Do you want to help?',
+    socket.on('doubtRequest', async (doubtData) => {
+      try {
+        
+        const onlineTutorsAvailability = await TutorAvailability.find({
+          tutorId: { $ne: doubtData.tutorId }, 
+          lastPingTime: { $gt: Date.now() - 3000 },
         });
-      });
-    } catch (error) {
-      console.error('Error fetching online tutors:', error);
-    }
-  });
+        
+        const onlineTutorIds = onlineTutorsAvailability.map((tutorAvailability) => tutorAvailability.tutorId);
+
+        const onlineTutors = await UserModel.find({
+          _id: { $in: onlineTutorIds },
+          userType: 'Tutor',
+          language: doubtData.language,
+          subject: doubtData.subject,
+        });
+
+        console.log(onlineTutorIds)
+        onlineTutors.forEach((onlineTutor) => {
+          io.to(onlineTutor.socketId).emit('notification', {
+            studentId: doubtData.studentId,
+            message: 'New doubt request. Do you want to help?',
+          });
+        });
+      } catch (error) {
+        console.error('Error fetching online tutors:', error);
+      }
+    });
+    
   
    
 
@@ -90,25 +109,21 @@ io.on('connection', (socket) => {
       const studentSocketId = response.studentSocketId;
       const tutorSocketId = response.tutorSocketId;
   
-     
       const chatRoomId = `${response.studentId}-${response.tutorId}`;
   
-      
       io.to(studentSocketId).emit('startChat', {
         tutorId: response.tutorId,
         chatRoomId,
       });
       io.to(studentSocketId).emit('joinChatRoom', chatRoomId);
-
-
+  
       io.to(tutorSocketId).emit('startChat', {
         studentId: response.studentId,
         chatRoomId,
       });
-
+  
       io.to(tutorSocketId).emit('joinChatRoom', chatRoomId);
   
-      
       try {
         const tutorAvailability = await TutorAvailability.findOne({
           tutorId: response.tutorId,
@@ -140,27 +155,40 @@ io.on('connection', (socket) => {
 
   });
   
-  cron.schedule('*/20 * * * *', async () => {
+  async function updateAvailableTutorsCount() {
     const currentTime = Date.now();
   
     try {
-     
-      await UserModel.updateMany(
-        { lastPingTime: { $gt: currentTime - 3000 }, userType: 'Tutor' },
-        { $set: { lastPingTime: currentTime } }
-      );
-  
-     
-      const availableTutorsCount = await UserModel.countDocuments({
+      const availableTutorsCount = await TutorAvailability.countDocuments({
         lastPingTime: { $gt: currentTime - 3000 },
-        userType: 'Tutor',
       });
   
       io.emit('availableTutorsCount', availableTutorsCount);
     } catch (error) {
-      console.error('Error updating tutor availability with CRON job:', error);
+      console.error('Error updating tutor availability:', error);
     }
-  });
+  }
+  // cron.schedule('*/3 * * * *', async () => {
+  //   const currentTime = Date.now();
+  
+  //   try {
+     
+  //     await UserModel.updateMany(
+  //       { lastPingTime: { $gt: currentTime - 3000 }, userType: 'Tutor' },
+  //       { $set: { lastPingTime: currentTime } }
+  //     );
+  
+     
+  //     const availableTutorsCount = await UserModel.countDocuments({
+  //       lastPingTime: { $gt: currentTime - 3000 },
+  //       userType: 'Tutor',
+  //     });
+  
+  //     io.emit('availableTutorsCount', availableTutorsCount);
+  //   } catch (error) {
+  //     console.error('Error updating tutor availability with CRON job:', error);
+  //   }
+  // });
 
 io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);

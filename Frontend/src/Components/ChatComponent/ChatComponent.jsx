@@ -8,7 +8,7 @@ const ChatComponent = ({ userId, chatRoomId }) => {
 
   useEffect(() => {
    
-    const newSocket = io('https://doubtshare-smlr.onrender.com/', { transports: ['websocket'] });
+    const newSocket = io('http://localhost:5050/', { transports: ['websocket'] });
     setSocket(newSocket);
 
     

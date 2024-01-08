@@ -14,7 +14,7 @@ const StudentComponent = () => {
   const [showChat, setShowChat] = useState(false); 
 
   useEffect(() => {
-    const newSocket = io('https://doubtshare-smlr.onrender.com/', { transports: ['websocket'] });
+    const newSocket = io('http://localhost:5050/', { transports: ['websocket'] });
 
     setSocket(newSocket);
 
@@ -49,7 +49,7 @@ const StudentComponent = () => {
 
   const fetchDoubtData = async () => {
     try {
-      const response = await fetch('https://doubtshare-smlr.onrender.com/user/one', {
+      const response = await fetch(`http://localhost:5050/user/one/${userId}`, {
         headers: {
           Authorization: `${token}`,
         },

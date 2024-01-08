@@ -13,53 +13,60 @@ const TutorOnlinePage = () => {
   const [showChat, setShowChat] = useState(false); 
 
   useEffect(() => {
-    
-    const newSocket = io('https://doubtshare-smlr.onrender.com/', { transports: ['websocket'] });
+    const newSocket = io('http://localhost:5050/', { transports: ['websocket'] });
+  
+    newSocket.on('connect', () => {
+      console.log('Socket connected successfully');
+    });
+  
     setSocket(newSocket);
-
+  
+    newSocket.emit('ping', userId);
+  
    
-    newSocket.emit('ping',userId ); 
-
+    const pingInterval = setInterval(() => {
+      console.log(userId)
+      newSocket.emit('ping', userId);
+    }, 3000);
   
     return () => {
+      clearInterval(pingInterval); 
       newSocket.disconnect();
     };
-  }, []);
+  }, [userId]);
+  
 
   useEffect(() => {
-  
-    socket && socket.on('availableTutorsCount', (count) => {
-      setAvailableTutorsCount(count);
-    });
+    socket &&
+      socket.on('availableTutorsCount', (count) => {
+        console.log('Received availableTutorsCount:', count);
+        setAvailableTutorsCount(count);
+      });
+  }, [socket]);
 
-    socket && socket.on('notification', (notification) => {
-      setNotifications((prevNotifications) => [
-        ...prevNotifications,
-        notification,
-      ]);
-    });
+  useEffect(() => {
+    socket &&
+      socket.on('notification', (notification) => {
+        console.log('Received notification:', notification);
+        setNotifications((prevNotifications) => [
+          ...prevNotifications,
+          notification,
+        ]);
+      });
+  }, [socket]);
 
-
+  useEffect(() => {
     socket &&
       socket.on('tutorResponse', (response) => {
+        console.log('Received tutorResponse:', response);
         if (response.accepted) {
-         
           setChatRoomId(response.chatRoomId);
           setShowChat(true);
         } else {
-         
           console.log('Tutor rejected the doubt request:', response);
         }
       });
-
-  
-    return () => {
-      socket && socket.off('availableTutorsCount');
-      socket && socket.off('notification');
-      socket && socket.off('tutorResponse');
-    };
   }, [socket]);
-
  
   const handleTutorResponse = (accepted, doubtId, studentId) => {
 
